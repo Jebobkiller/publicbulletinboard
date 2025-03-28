@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Bulletin Board</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #f5f5dc;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #8b4513;
+        }
+        .note-form {
+            margin-bottom: 20px;
+            background: #fff8e1;
+            padding: 15px;
+            border: 1px dashed #8b4513;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #8b4513;
+            background: #fffff0;
+            font-family: inherit;
+        }
+        button {
+            background: #8b4513;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #a0522d;
+        }
+        .notes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .note {
+            background: #fff8e1;
+            padding: 15px;
+            border: 1px solid #8b4513;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.1);
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Anonymous Bulletin Board</h1>
+        
+        <div class="note-form">
+            <h3>Post a Note</h3>
+            <textarea id="note-content" rows="4" placeholder="Write your anonymous note here..."></textarea>
+            <input type="text" id="note-nickname" placeholder="Optional nickname (leave blank for anonymous)">
+            <button id="post-button">Post Note</button>
+        </div>
+        
+        <div class="notes-container" id="notes-container">
+            <!-- Notes will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // Function to add a new note to the board
+        function addNote(content, nickname) {
+            const notesContainer = document.getElementById('notes-container');
+            const noteElement = document.createElement('div');
+            noteElement.className = 'note';
+            noteElement.innerHTML = nickname ? `<strong>${nickname}:</strong><br>${content}` : content;
+            notesContainer.prepend(noteElement);
+        }
+
+        // Handle form submission
+        document.getElementById('post-button').addEventListener('click', () => {
+            const content = document.getElementById('note-content').value.trim();
+            const nickname = document.getElementById('note-nickname').value.trim();
+            if (content) {
+                addNote(content, nickname);
+                document.getElementById('note-content').value = '';
+                document.getElementById('note-nickname').value = '';
+                
+                // In a real implementation, we would save to a database here
+                // For now, we'll just store in localStorage
+                const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+                notes.unshift({content, nickname});
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+        });
+
+        // Load existing notes on page load
+        window.addEventListener('load', () => {
+            const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+            notes.forEach(note => addNote(note.content, note.nickname));
+        });
+    </script>
+</body>
+</html>
