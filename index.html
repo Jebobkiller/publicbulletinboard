@@ -94,22 +94,17 @@
                 document.getElementById('note-content').value = '';
                 document.getElementById('note-nickname').value = '';
                 
-                // Save to the backend server
-                fetch('/notes', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({content, nickname})
-                });
+                // Save to localStorage
+                const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+                notes.unshift({content, nickname, timestamp: new Date().toISOString()});
+                localStorage.setItem('notes', JSON.stringify(notes));
             }
         });
 
-        // Load existing notes from server on page load
+        // Load existing notes from localStorage on page load
         window.addEventListener('load', () => {
-            fetch('/notes')
-                .then(response => response.json())
-                .then(notes => notes.forEach(note => addNote(note.content, note.nickname)));
+            const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+            notes.forEach(note => addNote(note.content, note.nickname));
         });
     </script>
 </body>
