@@ -94,18 +94,22 @@
                 document.getElementById('note-content').value = '';
                 document.getElementById('note-nickname').value = '';
                 
-                // In a real implementation, we would save to a database here
-                // For now, we'll just store in localStorage
-                const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-                notes.unshift({content, nickname});
-                localStorage.setItem('notes', JSON.stringify(notes));
+                // Save to the backend server
+                fetch('/notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({content, nickname})
+                });
             }
         });
 
-        // Load existing notes on page load
+        // Load existing notes from server on page load
         window.addEventListener('load', () => {
-            const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-            notes.forEach(note => addNote(note.content, note.nickname));
+            fetch('/notes')
+                .then(response => response.json())
+                .then(notes => notes.forEach(note => addNote(note.content, note.nickname)));
         });
     </script>
 </body>
